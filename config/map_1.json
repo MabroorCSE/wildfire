@@ -1,7 +1,8 @@
 {
     "cells": {
         "default": {
-            "delay": "inertial"
+            "delay": "inertial",
+            "eoc": ["cellStateOut"]
         },
         "471785_5102860": {
             "neighborhood": {

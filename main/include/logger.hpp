@@ -8,6 +8,7 @@
 #include <utility>
 #include <chrono>
 #include <cadmium/core/logger/logger.hpp>
+#include "hybrid_coupled.hpp"
 
 class Logger : public cadmium::Logger
 {
@@ -16,23 +17,36 @@ public:
     Logger(const std::string& filepath,  std::chrono::system_clock::time_point start_time)
         : cadmium::Logger(), startTime(start_time)
         , filepath(filepath)
-        , file() {}
+        , avgFilepath(filepath.substr(0, filepath.find_last_of('.')) + "_avg.csv")
+        , file()
+        , avgFile() {}
 
     void start() override
     {
         file.open(filepath);
         //set column titles
         file << "time,x,y,ignited,willignite,simtime,ignitionTime,sigma,spreadDir,rateOfSpread" << std::endl;
+
+        avgFile.open(avgFilepath);
+        avgFile << "time,percentCellsIgnited" << std::endl;
     }
 
     void stop() override
     {
         file.close();
+        avgFile.close();
     }
     //override the normal logging outputs
     void logOutput(double time, long modelId, const std::string& modelName, const std::string& portName, const std::string& output) override {}
     void logState(double time, long modelId, const std::string& modelName, const std::string& state) override
     {
+        //the atomic average model has its own single-value state format; log it separately
+        if (modelName == WildfireHybridCoupled::averageModelId)
+        {
+            avgFile << time << "," << state << std::endl;
+            return;
+        }
+
         //pull all of the data from the logging stream
         std::istringstream stream(state);
         std::string x, y, ignited, willIgnite, ignitionTime, sigma, spreadDir, rateOfSpread;
@@ -81,6 +95,8 @@ public:
 
 private:
     std::string filepath;
+    std::string avgFilepath;
     std::ofstream file;
+    std::ofstream avgFile;
     std::chrono::system_clock::time_point startTime;
 };

@@ -2,7 +2,7 @@ if [ -d "build" ]; then rm -Rf build; fi
 mkdir -p build
 cd build || exit
 rm -rf *
-cmake ..
+cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
 make
 cd ..
 echo Compilation done. Executable in the bin folder

@@ -1,22 +1,14 @@
 
 #include <cadmium/core/logger/csv.hpp>
-#include <cadmium/celldevs/asymm/coupled.hpp>
-#include <cadmium/core/logger/csv.hpp>
 #include <cadmium/core/simulation/root_coordinator.hpp>
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "include/cell.hpp"
 #include "include/state.hpp"
+#include "include/hybrid_coupled.hpp"
 #include "include/logger.hpp"
 
 
-
-std::shared_ptr<cadmium::celldevs::AsymmCell<State, double>> addCell(
-    const std::string& cellId, const std::shared_ptr<const cadmium::celldevs::AsymmCellConfig<State, double>>& cellConfig)
-{
-    return std::make_shared<Cell>(cellId, cellConfig);
-}
 
 std::chrono::system_clock::time_point parseDateTime(const std::string& start_time_str) {
     std::tm tm = {};
@@ -47,9 +39,8 @@ int main(int argc, char** argv)
     std::string start_time_str = argv[3];
     auto start_time = parseDateTime(start_time_str);
 
-    auto model = std::make_shared<cadmium::celldevs::AsymmCellDEVSCoupled<State, double>>("behave", addCell, argv[1]);
-    model->buildModel();
-    
+    auto model = std::make_shared<WildfireHybridCoupled>("hybrid", argv[1]);
+
     auto rootCoordinator = cadmium::RootCoordinator(model);
 	auto logger = std::make_shared<Logger>(argv[2], start_time);
 

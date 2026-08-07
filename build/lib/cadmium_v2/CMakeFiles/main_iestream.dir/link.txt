@@ -1,0 +1,1 @@
+/usr/bin/c++  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/main_iestream.dir/example/iestream/main_iestream.cpp.o -o /Users/hugocrepin/Documents/wildfire/lib/cadmium_v2/bin/main_iestream
