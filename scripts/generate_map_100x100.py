@@ -1,5 +1,5 @@
 """
-Générateur de grille 100x100 réaliste pour le modèle Wildfire (murf85)
+Générateur de grille 100x100 réaliste pour le modèle Wildfire (Mohamed)
 =======================================================================
 Paramètres inspirés de map_1.json :
   - fuelModelNumber : type de végétation (modèle BehavePlus)
