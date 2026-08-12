@@ -9,13 +9,50 @@
 #include <cadmium/celldevs/asymm/config.hpp>
 #include <behave/surface.h>
 #include <behave/fuelModels.h>
+#include "cell_command.hpp"
 #include "state.hpp"
 
 class Cell : public cadmium::celldevs::AsymmCell<State, double>
 {
 public:
+    cadmium::Port<CellCommand> commandIn;
+
     Cell(const std::string& id, const std::shared_ptr<const cadmium::celldevs::AsymmCellConfig<State, double>>& config)
-        : cadmium::celldevs::AsymmCell<State, double>(id, config) {}
+        : cadmium::celldevs::AsymmCell<State, double>(id, config)
+    {
+        commandIn = addInPort<CellCommand>("commandIn");
+    }
+
+    void externalTransition(double e) override
+    {
+        this->clock += e;
+        this->sigma -= e;
+
+        bool forcedExtinguish = false;
+        for (const CellCommand& cmd : commandIn->getBag())
+        {
+            if (cmd.targetCellId == this->id)
+            {
+                state.ignited = false;
+                state.ignitionTime = std::numeric_limits<double>::infinity();
+                state.sigma = 0.0;
+                forcedExtinguish = true;
+            }
+        }
+
+        for (const auto& msg : this->inputNeighborhood->getBag())
+        {
+            this->neighborhood.at(msg->cellId).state = msg->state;
+        }
+
+        State nextState = forcedExtinguish ? state : localComputation(state, this->neighborhood);
+        if (forcedExtinguish || nextState != state)
+        {
+            this->outputQueue->addToQueue(nextState, this->clock + outputDelay(nextState));
+            this->sigma = this->outputQueue->nextTime() - this->clock;
+        }
+        state = nextState;
+    }
 
     [[nodiscard]] State localComputation(State state, const std::unordered_map<
         std::string, cadmium::celldevs::NeighborData<State, double>>& neighborhood) const override
@@ -32,6 +69,12 @@ public:
             state.sigma = 0.0;
             return state;
         }
+        //Recompute from scratch against the current neighborhood snapshot every time, rather than
+        //carrying the previous ignitionTime forward: otherwise, if the one neighbor that set it is
+        //later extinguished, this cell keeps counting down to a threat that no longer exists.
+        state.ignitionTime = std::numeric_limits<double>::infinity();
+        state.willIgnite = false;
+
         //if it's not yet ignited it should check whether whatever woke the cell will cause it to ignite, or ignite faster than previously calculated
         for (const auto& [neighborId, neighborData]: neighborhood)
         {
@@ -120,6 +163,10 @@ public:
             state.willIgnite = true;
             //passivate until ignition time
             state.sigma = std::max(state.ignitionTime - this->clock, 0.0);
+        }
+        if (!state.willIgnite)
+        {
+            state.sigma = std::numeric_limits<double>::infinity();
         }
         return state;
     }

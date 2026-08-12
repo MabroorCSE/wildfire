@@ -2,7 +2,8 @@
     "cells": {
         "default": {
             "delay": "inertial",
-            "eoc": ["cellStateOut"]
+            "eoc": ["cellStateOut"],
+            "eic": [["cellCommandIn", "commandIn"]]
         },
         "470980_5087210": {
             "neighborhood": {

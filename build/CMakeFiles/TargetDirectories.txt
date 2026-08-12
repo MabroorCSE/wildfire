@@ -16,3 +16,6 @@
 /Users/hugocrepin/Documents/wildfire/build/lib/cadmium_v2/CMakeFiles/main_iestream.dir
 /Users/hugocrepin/Documents/wildfire/build/lib/cadmium_v2/CMakeFiles/edit_cache.dir
 /Users/hugocrepin/Documents/wildfire/build/lib/cadmium_v2/CMakeFiles/rebuild_cache.dir
+/Users/hugocrepin/Documents/wildfire/build/python/CMakeFiles/wildfire_env.dir
+/Users/hugocrepin/Documents/wildfire/build/python/CMakeFiles/edit_cache.dir
+/Users/hugocrepin/Documents/wildfire/build/python/CMakeFiles/rebuild_cache.dir

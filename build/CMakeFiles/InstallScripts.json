@@ -4,7 +4,8 @@
 		"/Users/hugocrepin/Documents/wildfire/build/cmake_install.cmake",
 		"/Users/hugocrepin/Documents/wildfire/build/main/cmake_install.cmake",
 		"/Users/hugocrepin/Documents/wildfire/build/lib/behave/cmake_install.cmake",
-		"/Users/hugocrepin/Documents/wildfire/build/lib/cadmium_v2/cmake_install.cmake"
+		"/Users/hugocrepin/Documents/wildfire/build/lib/cadmium_v2/cmake_install.cmake",
+		"/Users/hugocrepin/Documents/wildfire/build/python/cmake_install.cmake"
 	],
 	"Parallel" : false
 }

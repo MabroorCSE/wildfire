@@ -66,24 +66,28 @@ CMAKE_BINARY_DIR = /Users/hugocrepin/Documents/wildfire/build
 all: main/all
 all: lib/behave/all
 all: lib/cadmium_v2/all
+all: python/all
 .PHONY : all
 
 # The main recursive "codegen" target.
 codegen: main/codegen
 codegen: lib/behave/codegen
 codegen: lib/cadmium_v2/codegen
+codegen: python/codegen
 .PHONY : codegen
 
 # The main recursive "preinstall" target.
 preinstall: main/preinstall
 preinstall: lib/behave/preinstall
 preinstall: lib/cadmium_v2/preinstall
+preinstall: python/preinstall
 .PHONY : preinstall
 
 # The main recursive "clean" target.
 clean: main/clean
 clean: lib/behave/clean
 clean: lib/cadmium_v2/clean
+clean: python/clean
 .PHONY : clean
 
 #=============================================================================
@@ -163,6 +167,25 @@ main/preinstall:
 # Recursive "clean" directory target.
 main/clean: main/CMakeFiles/wildfire.dir/clean
 .PHONY : main/clean
+
+#=============================================================================
+# Directory level rules for directory python
+
+# Recursive "all" directory target.
+python/all: python/CMakeFiles/wildfire_env.dir/all
+.PHONY : python/all
+
+# Recursive "codegen" directory target.
+python/codegen: python/CMakeFiles/wildfire_env.dir/codegen
+.PHONY : python/codegen
+
+# Recursive "preinstall" directory target.
+python/preinstall:
+.PHONY : python/preinstall
+
+# Recursive "clean" directory target.
+python/clean: python/CMakeFiles/wildfire_env.dir/clean
+.PHONY : python/clean
 
 #=============================================================================
 # Target rules for target main/CMakeFiles/wildfire.dir
@@ -483,6 +506,38 @@ lib/cadmium_v2/CMakeFiles/main_iestream.dir/codegen:
 lib/cadmium_v2/CMakeFiles/main_iestream.dir/clean:
 	$(MAKE) $(MAKESILENT) -f lib/cadmium_v2/CMakeFiles/main_iestream.dir/build.make lib/cadmium_v2/CMakeFiles/main_iestream.dir/clean
 .PHONY : lib/cadmium_v2/CMakeFiles/main_iestream.dir/clean
+
+#=============================================================================
+# Target rules for target python/CMakeFiles/wildfire_env.dir
+
+# All Build rule for target.
+python/CMakeFiles/wildfire_env.dir/all: lib/behave/CMakeFiles/behave.dir/all
+	$(MAKE) $(MAKESILENT) -f python/CMakeFiles/wildfire_env.dir/build.make python/CMakeFiles/wildfire_env.dir/depend
+	$(MAKE) $(MAKESILENT) -f python/CMakeFiles/wildfire_env.dir/build.make python/CMakeFiles/wildfire_env.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/hugocrepin/Documents/wildfire/build/CMakeFiles --progress-num=78,79 "Built target wildfire_env"
+.PHONY : python/CMakeFiles/wildfire_env.dir/all
+
+# Build rule for subdir invocation for target.
+python/CMakeFiles/wildfire_env.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/hugocrepin/Documents/wildfire/build/CMakeFiles 43
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 python/CMakeFiles/wildfire_env.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/hugocrepin/Documents/wildfire/build/CMakeFiles 0
+.PHONY : python/CMakeFiles/wildfire_env.dir/rule
+
+# Convenience name for target.
+wildfire_env: python/CMakeFiles/wildfire_env.dir/rule
+.PHONY : wildfire_env
+
+# codegen rule for target.
+python/CMakeFiles/wildfire_env.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f python/CMakeFiles/wildfire_env.dir/build.make python/CMakeFiles/wildfire_env.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/hugocrepin/Documents/wildfire/build/CMakeFiles --progress-num=78,79 "Finished codegen for target wildfire_env"
+.PHONY : python/CMakeFiles/wildfire_env.dir/codegen
+
+# clean rule for target.
+python/CMakeFiles/wildfire_env.dir/clean:
+	$(MAKE) $(MAKESILENT) -f python/CMakeFiles/wildfire_env.dir/build.make python/CMakeFiles/wildfire_env.dir/clean
+.PHONY : python/CMakeFiles/wildfire_env.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

@@ -247,6 +247,19 @@ main_iestream/fast:
 	$(MAKE) $(MAKESILENT) -f lib/cadmium_v2/CMakeFiles/main_iestream.dir/build.make lib/cadmium_v2/CMakeFiles/main_iestream.dir/build
 .PHONY : main_iestream/fast
 
+#=============================================================================
+# Target rules for targets named wildfire_env
+
+# Build rule for target.
+wildfire_env: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 wildfire_env
+.PHONY : wildfire_env
+
+# fast build rule for target.
+wildfire_env/fast:
+	$(MAKE) $(MAKESILENT) -f python/CMakeFiles/wildfire_env.dir/build.make python/CMakeFiles/wildfire_env.dir/build
+.PHONY : wildfire_env/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -265,6 +278,7 @@ help:
 	@echo "... main_grid_sir"
 	@echo "... main_iestream"
 	@echo "... wildfire"
+	@echo "... wildfire_env"
 .PHONY : help
 
 

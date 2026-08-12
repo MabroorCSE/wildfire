@@ -37,7 +37,7 @@ https://ftp.maps.canada.ca/pub/elevation/dem_mne/highresolution_hauteresolution/
 
 In order to properly run this project clone the main repo and all of the submodules using the clone and recurese submodules commands:
 
-git clone --recurse-submodules https://github.com/murf85/wildfire
+git clone --recurse-submodules https://github.com/hugocrp/wildfire.git
  
 Open the project in VSCode:
 

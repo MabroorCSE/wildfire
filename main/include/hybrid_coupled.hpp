@@ -14,17 +14,17 @@ inline std::shared_ptr<cadmium::celldevs::AsymmCell<State, double>> addWildfireC
     return std::make_shared<Cell>(cellId, cellConfig);
 }
 
-//Top-level hybrid DEVS/Cell-DEVS coupled model. It embeds the existing wildfire Cell-DEVS
-//coupled model unchanged, plus a plain atomic DEVS model connected to every cell.
-//The wildfire model exposes every cell's output through a single shared external output
-//coupling port ("cellStateOut"), declared once in each map's "default" cell config.
+//Hybrid DEVS/Cell-DEVS coupled model: the wildfire Cell-DEVS grid plus one atomic model
+//connected to every cell (percent on fire, reward, and a command channel targeting any cell).
 class WildfireHybridCoupled : public cadmium::Coupled
 {
 public:
     static constexpr const char* wildfireId = "wildfire";
     static constexpr const char* averageModelId = "percentIgnited";
 
-    WildfireHybridCoupled(const std::string& id, const std::string& configFilePath)
+    std::shared_ptr<AverageAtomic> averageModel;
+
+    WildfireHybridCoupled(const std::string& id, const std::string& configFilePath, double samplePeriod = 3600.0, int cellsPerDecision = 1)
         : cadmium::Coupled(id)
     {
         auto wildfire = std::make_shared<cadmium::celldevs::AsymmCellDEVSCoupled<State, double>>(
@@ -32,9 +32,10 @@ public:
         wildfire->buildModel();
         addComponent(wildfire);
 
-        auto averageModel = std::make_shared<AverageAtomic>(averageModelId);
+        averageModel = std::make_shared<AverageAtomic>(averageModelId, samplePeriod, cellsPerDecision);
         addComponent(averageModel);
 
         addIC(wildfireId, "cellStateOut", averageModelId, "cellStateIn");
+        addIC(averageModelId, "cellCommandOut", wildfireId, "cellCommandIn");
     }
 };

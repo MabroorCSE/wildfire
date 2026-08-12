@@ -273,6 +273,9 @@ OpenMP_C_LIB_NAMES:STRING=NOTFOUND
 //Path to a library.
 OpenMP_libomp_LIBRARY:FILEPATH=OpenMP_libomp_LIBRARY-NOTFOUND
 
+//No help, variable specified on the command line.
+Python3_EXECUTABLE:UNINITIALIZED=/Users/hugocrepin/Documents/wildfire/build/../.venv/bin/python3
+
 //Enable Behave RAWS Data Batch Reader
 RAWS_BATCH:BOOL=OFF
 
@@ -299,6 +302,9 @@ cadmium_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
 cadmium_SOURCE_DIR:STATIC=/Users/hugocrepin/Documents/wildfire/lib/cadmium_v2
+
+//The directory containing a CMake configuration file for pybind11.
+pybind11_DIR:PATH=pybind11_DIR-NOTFOUND
 
 //Value Computed by CMake
 wildfire_BINARY_DIR:STATIC=/Users/hugocrepin/Documents/wildfire/build
@@ -426,7 +432,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=4
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=5
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -471,6 +477,10 @@ CMAKE_TAPI-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Test HAS_FLTO
+HAS_FLTO:INTERNAL=1
+//Test HAS_FLTO_THIN
+HAS_FLTO_THIN:INTERNAL=1
 //Result of TRY_COMPILE
 OpenMP_COMPILE_RESULT_CXX_Xclang fopenmp:INTERNAL=FALSE
 //Result of TRY_COMPILE
@@ -485,6 +495,12 @@ OpenMP_C_FLAGS-ADVANCED:INTERNAL=1
 OpenMP_C_LIB_NAMES-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OpenMP_libomp_LIBRARY
 OpenMP_libomp_LIBRARY-ADVANCED:INTERNAL=1
+//Python executable during the last CMake run
+PYBIND11_PYTHON_EXECUTABLE_LAST:INTERNAL=/Users/hugocrepin/Documents/wildfire/build/../.venv/bin/python3
+//Python debug status
+PYTHON_IS_DEBUG:INTERNAL=0
+PYTHON_MODULE_DEBUG_POSTFIX:INTERNAL=
+PYTHON_MODULE_EXTENSION:INTERNAL=.cpython-314-darwin.so
 //Components requested for this build tree.
 _Boost_COMPONENTS_SEARCHED:INTERNAL=filesystem;system;unit_test_framework
 //Last used Boost_INCLUDE_DIR value.
@@ -493,4 +509,21 @@ _Boost_INCLUDE_DIR_LAST:INTERNAL=Boost_INCLUDE_DIR-NOTFOUND
 _Boost_NAMESPACE_LAST:INTERNAL=boost
 //Last used Boost_USE_MULTITHREADED value.
 _Boost_USE_MULTITHREADED_LAST:INTERNAL=TRUE
+_PYBIND11_CROSSCOMPILING:INTERNAL=OFF
+_Python:INTERNAL=Python3
+//Compiler reason failure
+_Python3_Compiler_REASON_FAILURE:INTERNAL=
+_Python3_DEVELOPMENT_MODULE_SIGNATURE:INTERNAL=fbf0eba23be45a76450bb2da0d8512af
+//Development reason failure
+_Python3_Development_REASON_FAILURE:INTERNAL=
+_Python3_EXECUTABLE:INTERNAL=/Users/hugocrepin/Documents/wildfire/build/../.venv/bin/python3
+//Path to a file.
+_Python3_INCLUDE_DIR:INTERNAL=/opt/homebrew/opt/python@3.14/Frameworks/Python.framework/Versions/3.14/include/python3.14
+//Python3 Properties
+_Python3_INTERPRETER_PROPERTIES:INTERNAL=Python;3;14;6;64;<none>;cpython-314-darwin;abi3;/opt/homebrew/opt/python@3.14/Frameworks/Python.framework/Versions/3.14/lib/python3.14;/Users/hugocrepin/Documents/wildfire/.venv/lib/python3.14;/Users/hugocrepin/Documents/wildfire/.venv/lib/python3.14/site-packages;/Users/hugocrepin/Documents/wildfire/.venv/lib/python3.14/site-packages
+_Python3_INTERPRETER_SIGNATURE:INTERNAL=8e674204dc0e7dbfb2913c5eab59b8d4
+//NumPy reason failure
+_Python3_NumPy_REASON_FAILURE:INTERNAL=
+//Directories where pybind11 and possibly Python headers are located
+pybind11_INCLUDE_DIRS:INTERNAL=/Users/hugocrepin/Documents/wildfire/.venv/lib/python3.14/site-packages/pybind11/include;/opt/homebrew/opt/python@3.14/Frameworks/Python.framework/Versions/3.14/include/python3.14
 

@@ -1145,8 +1145,10 @@ main/CMakeFiles/wildfire.dir/main.cpp.o: \
   /Users/hugocrepin/Documents/wildfire/lib/cadmium_v2/include/cadmium/celldevs/asymm/../core/../../core/exception.hpp \
   /Users/hugocrepin/Documents/wildfire/lib/cadmium_v2/include/cadmium/celldevs/asymm/../../core/exception.hpp \
   /Users/hugocrepin/Documents/wildfire/main/include/average_atomic.hpp \
+  /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/unordered_set \
   /Users/hugocrepin/Documents/wildfire/lib/cadmium_v2/include/cadmium/core/modeling/atomic.hpp \
   /Users/hugocrepin/Documents/wildfire/lib/cadmium_v2/include/cadmium/celldevs/core/msg.hpp \
+  /Users/hugocrepin/Documents/wildfire/main/include/cell_command.hpp \
   /Users/hugocrepin/Documents/wildfire/main/include/cell.hpp \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/cfloat \
   /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/float.h \

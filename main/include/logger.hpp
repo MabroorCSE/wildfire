@@ -28,7 +28,7 @@ public:
         file << "time,x,y,ignited,willignite,simtime,ignitionTime,sigma,spreadDir,rateOfSpread" << std::endl;
 
         avgFile.open(avgFilepath);
-        avgFile << "time,percentCellsIgnited" << std::endl;
+        avgFile << "time,percentCellsIgnited,reward" << std::endl;
     }
 
     void stop() override
@@ -40,7 +40,6 @@ public:
     void logOutput(double time, long modelId, const std::string& modelName, const std::string& portName, const std::string& output) override {}
     void logState(double time, long modelId, const std::string& modelName, const std::string& state) override
     {
-        //the atomic average model has its own single-value state format; log it separately
         if (modelName == WildfireHybridCoupled::averageModelId)
         {
             avgFile << time << "," << state << std::endl;
