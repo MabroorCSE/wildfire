@@ -39,10 +39,6 @@ function loadIndependentPercentSeries(cellsCsvPath, totalCells) {
     return series;
 }
 
-// The atomic model logs its state after every cell update, not just on its own
-// periodic samples, so most consecutive rows repeat the last sampled value (that's
-// the whole point of sampling every N seconds instead of reacting to every change).
-// Only the first row of each new value is an actual fresh sample; keep only those.
 function loadModelPercentSeries(avgCsvPath) {
     const series = [];
     let previousValue = null;
@@ -82,10 +78,6 @@ function main() {
     const independentSeries = loadIndependentPercentSeries(cellsCsvPath, totalCells);
     let modelSeries = loadModelPercentSeries(avgCsvPath);
 
-    // The very first row is logged by Cadmium's root coordinator before any message
-    // has actually been exchanged (it's just the atomic model's constructor default),
-    // so it never reflects cells that were already ignited at t=0 in the config. Every
-    // later row is a post-transition sample, so I only validate those.
     if (modelSeries.length && modelSeries[0].time === 0) {
         modelSeries = modelSeries.slice(1);
     }
