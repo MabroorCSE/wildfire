@@ -5,7 +5,7 @@ import sys
 import wildfire_env
 
 CONFIG_PATH = "config/map_1.json"
-SAMPLE_PERIOD = 1800.0  # 30 min between decisions (was 1h)
+SAMPLE_PERIOD = 1800.0  # 30 min between decisions
 EPISODES = 100
 STEPS_PER_EPISODE = 40  # 40 x 30min = 20h simulated, same total episode length as before
 ALPHA = 0.3
@@ -15,7 +15,7 @@ EPSILON_END = 0.05
 EPSILON_DECAY_EPISODES = 40  # linearly reaches EPSILON_END by this episode, then stays flat
 PERCENT_BUCKET_SIZE = 5.0  # % ignited per state bucket
 EXTINGUISH_BONUS = 2.0  # shaped reward for successfully putting out a cell that was burning
-CELLS_PER_DECISION = 1  # how many cells topDangerousCells() targets; change freely
+CELLS_PER_DECISION = 1
 
 ACTION_NONE = 0
 ACTION_EXTINGUISH = 1
