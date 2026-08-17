@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
+import csv
+import os
 import random
 import sys
+import time
+
+from tensorboardX import SummaryWriter
 
 import wildfire_env
 
@@ -8,8 +13,8 @@ CONFIG_PATH = "config/train_medium_wind_small.json"
 SAMPLE_PERIOD = 1800.0
 EPISODES = 100
 STEPS_PER_EPISODE = 40
-LEARNING_RATE = 0.3 # contrôle à quel point une nouvelle expérience vient corriger ce que la table savait déjà.
-DISCOUNT_FACTOR = 0.9 # contrôle à quel point l'agent se soucie de ce qui arrive APRÈS l'action, pas juste la récompense
+LEARNING_RATE = 0.3
+DISCOUNT_FACTOR = 0.9
 EPSILON_START = 1.0
 EPSILON_END = 0.05
 EPSILON_DECAY_EPISODES = 40
@@ -20,10 +25,15 @@ CELLS_PER_DECISION = 1
 ACTION_NONE = 0
 ACTION_EXTINGUISH = 1
 ACTIONS = [ACTION_NONE, ACTION_EXTINGUISH]
+ACTION_NAMES = {ACTION_NONE: "none", ACTION_EXTINGUISH: "extinguish"}
 
 RED = "\033[31m"
 GREEN = "\033[32m"
 RESET = "\033[0m"
+
+RUN_ID = time.strftime("%Y%m%d-%H%M%S")
+TENSORBOARD_DIR = f"runs/{RUN_ID}"
+EXTINGUISH_LOG_PATH = f"logs/{RUN_ID}_extinguish_log.csv"
 
 
 def colored(value: float, fmt: str = ".1f") -> str:
@@ -52,13 +62,13 @@ def choose_action(q_table: dict, bucket: int, epsilon: float) -> int:
     return max(ACTIONS, key=lambda action: q_table.get((bucket, action), 0.0))
 
 
-def run_episode(env: wildfire_env.WildfireEnvironment, q_table: dict, epsilon: float) -> tuple[float, float]:
+def run_episode(env: wildfire_env.WildfireEnvironment, q_table: dict, epsilon: float, episode: int, extinguish_log: csv.writer) -> tuple[float, float]:
     percent_ignited = env.reset()
     bucket = percent_to_bucket(percent_ignited)
     total_reward = 0.0
     total_training_reward = 0.0
 
-    for _ in range(STEPS_PER_EPISODE):
+    for step in range(STEPS_PER_EPISODE):
         action = choose_action(q_table, bucket, epsilon)
 
         target_cell_ids = []
@@ -74,6 +84,8 @@ def run_episode(env: wildfire_env.WildfireEnvironment, q_table: dict, epsilon: f
         current_value = q_table.get((bucket, action), 0.0)
         q_table[(bucket, action)] = current_value + LEARNING_RATE * (training_reward + DISCOUNT_FACTOR * best_next_value - current_value)
 
+        extinguish_log.writerow([episode, step, f"{percent_ignited:.4f}", ACTION_NAMES[action], ";".join(target_cell_ids), reward, training_reward])
+
         bucket = next_bucket
         total_reward += reward
         total_training_reward += training_reward
@@ -86,18 +98,36 @@ def main():
     env = wildfire_env.WildfireEnvironment(config_path, SAMPLE_PERIOD, CELLS_PER_DECISION)
     q_table = {}
 
-    for episode in range(EPISODES):
-        epsilon = epsilon_for_episode(episode)
-        total_reward, total_training_reward = run_episode(env, q_table, epsilon)
-        print(f"episode {episode}: epsilon={epsilon:.2f} reward={colored(total_reward)} training_reward={colored(total_training_reward)}")
+    os.makedirs("logs", exist_ok=True)
+    tensorboard_writer = SummaryWriter(TENSORBOARD_DIR)
+
+    with open(EXTINGUISH_LOG_PATH, "w", newline="") as log_file:
+        extinguish_log = csv.writer(log_file)
+        extinguish_log.writerow(["episode", "step", "percent_ignited", "action", "target_cell_ids", "reward", "training_reward"])
+
+        for episode in range(EPISODES):
+            epsilon = epsilon_for_episode(episode)
+            total_reward, total_training_reward = run_episode(env, q_table, epsilon, episode, extinguish_log)
+            print(f"episode {episode}: epsilon={epsilon:.2f} reward={colored(total_reward)} training_reward={colored(total_training_reward)}")
+
+            tensorboard_writer.add_scalar("episode/reward", total_reward, episode)
+            tensorboard_writer.add_scalar("episode/training_reward", total_training_reward, episode)
+            tensorboard_writer.add_scalar("episode/discover", epsilon, episode)
+            for bucket in sorted({bucket for bucket, _action in q_table}):
+                tensorboard_writer.add_scalar(f"q_none/{bucket_label(bucket)}", q_table.get((bucket, ACTION_NONE), 0.0), episode)
+                tensorboard_writer.add_scalar(f"q_extinguish/{bucket_label(bucket)}", q_table.get((bucket, ACTION_EXTINGUISH), 0.0), episode)
 
     env.close()
+    tensorboard_writer.close()
 
     print("\nlearned Q-table (% of grid on fire: Q[none], Q[extinguish]):")
     for bucket in sorted({bucket for bucket, _action in q_table}):
         none_value = colored(q_table.get((bucket, ACTION_NONE), 0.0), '.2f')
         extinguish_value = colored(q_table.get((bucket, ACTION_EXTINGUISH), 0.0), '.2f')
         print(f"  {bucket_label(bucket)}: {none_value}, {extinguish_value}")
+
+    print(f"\nTensorBoard logs: {TENSORBOARD_DIR}")
+    print(f"Extinguish log: {EXTINGUISH_LOG_PATH}")
 
 
 if __name__ == "__main__":

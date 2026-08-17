@@ -66,6 +66,24 @@ On the Temporal controller click the blue arrows and select Full Range, and set 
 
 For more detailed instruction on QGIS or maps see https://github.com/jsoulier/wildfire_simulator/blob/main/README.md
 
+**RL training**
 
+Set up:
 
+python3 -m venv .venv
 
+Run the model here like before :
+source .venv/bin/activate
+
+pip install tensorboard tensorboardX
+
+Train the model:
+
+source .venv/bin/activate
+PYTHONPATH=build/python python3 python/train_q_learning.py config/train_medium_wind_small.json
+
+View the training logs in TensorBoard:
+
+tensorboard --logdir runs
+
+Then open http://localhost:6006 in a browser with the default port
