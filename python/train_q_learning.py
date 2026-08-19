@@ -4,6 +4,7 @@ import os
 import random
 import sys
 import time
+from collections import deque
 
 from tensorboardX import SummaryWriter
 
@@ -21,6 +22,7 @@ EPSILON_DECAY_EPISODES = 40
 PERCENT_BUCKET_SIZE = 5.0
 EXTINGUISH_BONUS = 2.0
 CELLS_PER_DECISION = 1
+ROLLING_AVERAGE_WINDOW = 10
 
 ACTION_NONE = 0
 ACTION_EXTINGUISH = 1
@@ -100,6 +102,7 @@ def main():
 
     os.makedirs("logs", exist_ok=True)
     tensorboard_writer = SummaryWriter(TENSORBOARD_DIR)
+    recent_rewards = deque(maxlen=ROLLING_AVERAGE_WINDOW)
 
     with open(EXTINGUISH_LOG_PATH, "w", newline="") as log_file:
         extinguish_log = csv.writer(log_file)
@@ -110,7 +113,11 @@ def main():
             total_reward, total_training_reward = run_episode(env, q_table, epsilon, episode, extinguish_log)
             print(f"episode {episode}: epsilon={epsilon:.2f} reward={colored(total_reward)} training_reward={colored(total_training_reward)}")
 
+            recent_rewards.append(total_reward)
+            rolling_average_reward = sum(recent_rewards) / len(recent_rewards)
+
             tensorboard_writer.add_scalar("episode/reward", total_reward, episode)
+            tensorboard_writer.add_scalar("episode/reward_rolling_average", rolling_average_reward, episode)
             tensorboard_writer.add_scalar("episode/training_reward", total_training_reward, episode)
             tensorboard_writer.add_scalar("episode/discover", epsilon, episode)
             for bucket in sorted({bucket for bucket, _action in q_table}):
