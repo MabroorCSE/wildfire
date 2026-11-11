@@ -59,38 +59,58 @@ def bucket_label(bucket: int) -> str:
     high = low + PERCENT_BUCKET_SIZE
     return f"{low:.0f}-{high:.0f}%"
 
+def state_label(state: tuple) -> str:
+    bucket, water_left = state
+    return bucket_label(bucket) + ", " +f"water = {water_left:.0f}"
 
-def choose_action(q_table: dict, bucket: int, epsilon: float) -> int:
+def make_state(bucket:int, water_left:int) -> tuple:
+    return (bucket, water_left)
+
+
+def choose_action(q_table: dict, state: tuple, epsilon: float) -> int:
     if random.random() < epsilon:
         return random.choice(ACTIONS)
-    return max(ACTIONS, key=lambda action: q_table.get((bucket, action), 0.0))
+    return max(ACTIONS, key=lambda action: q_table.get((state, action), 0.0))
 
 
 def run_episode(env: wildfire_env.WildfireEnvironment, q_table: dict, epsilon: float, episode: int, extinguish_log: csv.writer) -> tuple[float, float]:
     percent_ignited = env.reset()
     bucket = percent_to_bucket(percent_ignited)
+    water_left = WATER_CAPACITY
+    refill_countdown = 0
+    state = make_state(bucket, water_left)
     total_reward = 0.0
     total_training_reward = 0.0
 
     for step in range(STEPS_PER_EPISODE):
-        action = choose_action(q_table, bucket, epsilon)
+        action = choose_action(q_table, state, epsilon)
 
         target_cell_ids = []
-        if action == ACTION_EXTINGUISH:
+        if action == ACTION_EXTINGUISH and water_left > 0:
             target_cell_ids = env.top_dangerous_cells()
+            water_left -= 1
+            if water_left == 0:
+                refill_countdown = REFILL_STEPS + 1
 
         percent_ignited, reward = env.step(target_cell_ids)
+
+        if refill_countdown > 0:
+            refill_countdown -= 1
+            if refill_countdown == 0:
+                water_left = WATER_CAPACITY
+
         next_bucket = percent_to_bucket(percent_ignited)
+        next_state = make_state(next_bucket, water_left)
 
         training_reward = reward + EXTINGUISH_BONUS * len(target_cell_ids)
 
-        best_next_value = max(q_table.get((next_bucket, next_action), 0.0) for next_action in ACTIONS)
-        current_value = q_table.get((bucket, action), 0.0)
-        q_table[(bucket, action)] = current_value + LEARNING_RATE * (training_reward + DISCOUNT_FACTOR * best_next_value - current_value)
+        best_next_value = max(q_table.get((next_state, next_action), 0.0) for next_action in ACTIONS)
+        current_value = q_table.get((state, action), 0.0)
+        q_table[(state, action)] = current_value + LEARNING_RATE * (training_reward + DISCOUNT_FACTOR * best_next_value - current_value)
 
         extinguish_log.writerow([episode, step, f"{percent_ignited:.4f}", ACTION_NAMES[action], ";".join(target_cell_ids), reward, training_reward])
 
-        bucket = next_bucket
+        state = next_state
         total_reward += reward
         total_training_reward += training_reward
 
@@ -122,18 +142,18 @@ def main():
             tensorboard_writer.add_scalar("episode/reward_rolling_average", rolling_average_reward, episode)
             tensorboard_writer.add_scalar("episode/training_reward", total_training_reward, episode)
             tensorboard_writer.add_scalar("episode/discover", epsilon, episode)
-            for bucket in sorted({bucket for bucket, _action in q_table}):
-                tensorboard_writer.add_scalar(f"q_none/{bucket_label(bucket)}", q_table.get((bucket, ACTION_NONE), 0.0), episode)
-                tensorboard_writer.add_scalar(f"q_extinguish/{bucket_label(bucket)}", q_table.get((bucket, ACTION_EXTINGUISH), 0.0), episode)
+            for state in sorted({state for state, _action in q_table}):
+                tensorboard_writer.add_scalar(f"q_none/{state_label(state)}", q_table.get((state, ACTION_NONE), 0.0), episode)
+                tensorboard_writer.add_scalar(f"q_extinguish/{state_label(state)}", q_table.get((state, ACTION_EXTINGUISH), 0.0), episode)
 
     env.close()
     tensorboard_writer.close()
 
-    print("\nlearned Q-table (% of grid on fire: Q[none], Q[extinguish]):")
-    for bucket in sorted({bucket for bucket, _action in q_table}):
-        none_value = colored(q_table.get((bucket, ACTION_NONE), 0.0), '.2f')
-        extinguish_value = colored(q_table.get((bucket, ACTION_EXTINGUISH), 0.0), '.2f')
-        print(f"  {bucket_label(bucket)}: {none_value}, {extinguish_value}")
+    print("\nlearned Q-table (% of grid on fire: Q[none], Q[extinguish]), water left:")
+    for state in sorted({state for state, _action in q_table}):
+        none_value = colored(q_table.get((state, ACTION_NONE), 0.0), '.2f')
+        extinguish_value = colored(q_table.get((state, ACTION_EXTINGUISH), 0.0), '.2f')
+        print(f"  {state_label(state)}: {none_value}, {extinguish_value}")
 
     print(f"\nTensorBoard logs: {TENSORBOARD_DIR}")
     print(f"Extinguish log: {EXTINGUISH_LOG_PATH}")
