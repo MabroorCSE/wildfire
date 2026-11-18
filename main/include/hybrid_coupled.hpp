@@ -7,6 +7,7 @@
 #include "average_atomic.hpp"
 #include "cell.hpp"
 #include "state.hpp"
+#include "aircraft.hpp"
 
 inline std::shared_ptr<cadmium::celldevs::AsymmCell<State, double>> addWildfireCell(
     const std::string& cellId, const std::shared_ptr<const cadmium::celldevs::AsymmCellConfig<State, double>>& cellConfig)
