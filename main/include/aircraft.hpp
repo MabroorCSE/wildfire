@@ -77,8 +77,19 @@ class Aircraft : public cadmium::Atomic<AircraftState>
 
         void externalTransition(AircraftState& s, double e) const override
         {
+            s.sigma -= e;
+            if (s.phase != AircraftPhase::Idle){
+                return;
+            }
 
+            s.targetCellId = orderIn->getBag().front().targetCellId;
+            auto [tx, ty] = parseCellId(s.targetCellId);
+            s.targetX = tx;
+            s.targetY = ty;
+            s.phase = AircraftPhase::FlyingToTarget;
+            s.sigma = std::hypot(s.targetX - s.x, s.targetY - s.y) / speed;
         }
+
 
         void output(const AircraftState& s) const override
         {
