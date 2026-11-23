@@ -25,6 +25,7 @@ WATER_CAPACITY = 5
 REFILL_STEPS = 4
 CELLS_PER_DECISION = 1
 ROLLING_AVERAGE_WINDOW = 10
+POLICY = "learn"
 
 ACTION_NONE = 0
 ACTION_EXTINGUISH = 1
@@ -68,6 +69,10 @@ def make_state(bucket:int, water_left:int) -> tuple:
 
 
 def choose_action(q_table: dict, state: tuple, epsilon: float) -> int:
+    if POLICY == "always":
+        return ACTION_EXTINGUISH
+    if POLICY == "never":
+        return ACTION_NONE
     if random.random() < epsilon:
         return random.choice(ACTIONS)
     return max(ACTIONS, key=lambda action: q_table.get((state, action), 0.0))

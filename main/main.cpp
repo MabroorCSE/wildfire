@@ -41,6 +41,8 @@ int main(int argc, char** argv)
 
     auto model = std::make_shared<WildfireHybridCoupled>("hybrid", argv[1]);
 
+    //model->averageModel->requestActions({"500030_5000600"});   // TEST: one order next to the ignition
+
     auto rootCoordinator = cadmium::RootCoordinator(model);
 	auto logger = std::make_shared<Logger>(argv[2], start_time);
 
