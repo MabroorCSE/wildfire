@@ -72,7 +72,37 @@ class Aircraft : public cadmium::Atomic<AircraftState>
 
         void internalTransition(AircraftState& s) const override
         {
+            switch (s.phase)
+            {
+                case AircraftPhase::FlyingToTarget:
+                    s.x = s.targetX;
+                    s.y = s.targetY;
+                    s.phase = AircraftPhase::Dropping;
+                    s.sigma = s.waterLeft/flowRate;
+                    break;
 
+                case AircraftPhase::Dropping:
+                    s.waterLeft = 0;
+                    s.phase = AircraftPhase::Returning;
+                    s.sigma = std::hypot(baseX - s.x, baseY - s.y) / speed;
+                    break;
+
+                case AircraftPhase::Returning:
+                    s.x = baseX;
+                    s.y = baseY;
+                    s.phase = AircraftPhase::Refilling;
+                    s.sigma = refillTime;
+                    break;
+
+                case AircraftPhase::Refilling:
+                    s.waterLeft = tankSize;
+                    s.phase = AircraftPhase::Idle;
+                    s.sigma = std::numeric_limits<double>::infinity();
+                    break;
+
+                default:  // Idle: never has an internal event
+                    break;
+            }
         }
 
         void externalTransition(AircraftState& s, double e) const override
@@ -93,7 +123,19 @@ class Aircraft : public cadmium::Atomic<AircraftState>
 
         void output(const AircraftState& s) const override
         {
+            switch (s.phase)
+            {
+                case AircraftPhase::FlyingToTarget:
+                    cellCommandOut->addMessage(CellCommand{s.targetCellId});
+                    break;
 
+                case AircraftPhase::Refilling:
+                    readyOut->addMessage(getId());
+                    break;
+
+                default:  // other phases end without sending anything
+                    break;
+            }
         }
 
         [[nodiscard]] double timeAdvance(const AircraftState& s) const override
