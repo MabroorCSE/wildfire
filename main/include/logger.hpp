@@ -18,8 +18,10 @@ public:
         : cadmium::Logger(), startTime(start_time)
         , filepath(filepath)
         , avgFilepath(filepath.substr(0, filepath.find_last_of('.')) + "_avg.csv")
+        , aircraftFilepath(filepath.substr(0, filepath.find_last_of('.')) + "_aircraft.csv")
         , file()
-        , avgFile() {}
+        , avgFile() 
+        , aircraftFile() {}
 
     void start() override
     {
@@ -29,12 +31,15 @@ public:
 
         avgFile.open(avgFilepath);
         avgFile << "time,percentCellsIgnited,reward" << std::endl;
+        aircraftFile.open(aircraftFilepath);
+        aircraftFile << "time,x,y,targetX,targetY,waterLeft,phase,sigma" << std::endl;
     }
 
     void stop() override
     {
         file.close();
         avgFile.close();
+        aircraftFile.close();
     }
     //override the normal logging outputs
     void logOutput(double time, long modelId, const std::string& modelName, const std::string& portName, const std::string& output) override {}
@@ -43,6 +48,12 @@ public:
         if (modelName == WildfireHybridCoupled::averageModelId)
         {
             avgFile << time << "," << state << std::endl;
+            return;
+        }
+        
+        if (modelName == WildfireHybridCoupled::aircraftId)
+        {
+            aircraftFile << time << "," << state << std::endl;
             return;
         }
 
@@ -95,7 +106,9 @@ public:
 private:
     std::string filepath;
     std::string avgFilepath;
+    std::string aircraftFilepath;
     std::ofstream file;
     std::ofstream avgFile;
+    std::ofstream aircraftFile;
     std::chrono::system_clock::time_point startTime;
 };
