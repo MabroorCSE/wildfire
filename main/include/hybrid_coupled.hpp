@@ -15,17 +15,20 @@ inline std::shared_ptr<cadmium::celldevs::AsymmCell<State, double>> addWildfireC
     return std::make_shared<Cell>(cellId, cellConfig);
 }
 
-//Hybrid DEVS/Cell-DEVS coupled model: the wildfire Cell-DEVS grid plus one atomic model
-//connected to every cell (percent on fire, reward, and a command channel targeting any cell).
+//Hybrid DEVS/Cell-DEVS coupled model: the wildfire Cell-DEVS grid, the RL-side AverageAtomic
+//(percent on fire, reward, orders) and one Aircraft. Orders go RL -> aircraft -> cells, so a drop
+//reaches its target cell only after the flight time. Aircraft readyOut is not connected yet.
 class WildfireHybridCoupled : public cadmium::Coupled
 {
 public:
     static constexpr const char* wildfireId = "wildfire";
     static constexpr const char* averageModelId = "percentIgnited";
+    static constexpr const char* aircraftId = "aircraft";
 
     std::shared_ptr<AverageAtomic> averageModel;
+    std::shared_ptr<Aircraft> aircraft;
 
-    WildfireHybridCoupled(const std::string& id, const std::string& configFilePath, double samplePeriod = 3600.0, int cellsPerDecision = 1)
+    WildfireHybridCoupled(const std::string& id, const std::string& configFilePath, double samplePeriod = 3600.0, int cellsPerDecision = 1, double baseX = 505000, double baseY = 5000600, double tankSize = 1000, double flowRate = 500 , double refillTime = 120)
         : cadmium::Coupled(id)
     {
         auto wildfire = std::make_shared<cadmium::celldevs::AsymmCellDEVSCoupled<State, double>>(
@@ -34,9 +37,14 @@ public:
         addComponent(wildfire);
 
         averageModel = std::make_shared<AverageAtomic>(averageModelId, samplePeriod, cellsPerDecision);
+        aircraft = std::make_shared<Aircraft>(aircraftId, baseX, baseY, tankSize, flowRate, refillTime);
+        
         addComponent(averageModel);
+        addComponent(aircraft);
 
         addIC(wildfireId, "cellStateOut", averageModelId, "cellStateIn");
-        addIC(averageModelId, "cellCommandOut", wildfireId, "cellCommandIn");
+        addIC(averageModelId, "cellCommandOut", aircraftId, "orderIn");
+        addIC(aircraftId, "cellCommandOut", wildfireId, "cellCommandIn");
+
     }
 };
