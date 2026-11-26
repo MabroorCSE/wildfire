@@ -8,6 +8,7 @@
 #include "cell_command.hpp"
 #include "state.hpp"
 #include <cmath>
+#include <algorithm>
 
 enum class AircraftPhase
 {
@@ -57,13 +58,14 @@ class Aircraft : public cadmium::Atomic<AircraftState>
         double baseX;
         double baseY;
         double tankSize;
+        double dropAmount;
         double flowRate;
         double refillTime;
         double speed;
 
         explicit Aircraft(const std::string& id, double baseX, double baseY, double tankSize, double flowRate, double refillTime, double speed = 50.0)
             : cadmium::Atomic<AircraftState>(id, AircraftState(baseX, baseY, tankSize)),
-            baseX(baseX), baseY(baseY), tankSize(tankSize), flowRate(flowRate), refillTime(refillTime), speed(speed)
+            baseX(baseX), baseY(baseY), tankSize(tankSize), dropAmount(tankSize), flowRate(flowRate), refillTime(refillTime), speed(speed)
         {
             orderIn = addInPort<CellCommand>("orderIn");
             readyOut = addOutPort<std::string>("readyOut");
@@ -78,11 +80,11 @@ class Aircraft : public cadmium::Atomic<AircraftState>
                     s.x = s.targetX;
                     s.y = s.targetY;
                     s.phase = AircraftPhase::Dropping;
-                    s.sigma = s.waterLeft/flowRate;
+                    s.sigma = dropVolume(s)/flowRate;
                     break;
 
                 case AircraftPhase::Dropping:
-                    s.waterLeft = 0;
+                    s.waterLeft -= dropVolume(s); // later (partial drops): if waterLeft > 0, don't go to Returning.
                     s.phase = AircraftPhase::Returning;
                     s.sigma = std::hypot(baseX - s.x, baseY - s.y) / speed;
                     break;
@@ -126,7 +128,7 @@ class Aircraft : public cadmium::Atomic<AircraftState>
             switch (s.phase)
             {
                 case AircraftPhase::FlyingToTarget:
-                    cellCommandOut->addMessage(CellCommand{s.targetCellId});
+                    cellCommandOut->addMessage(CellCommand{s.targetCellId, dropVolume(s)});
                     break;
 
                 case AircraftPhase::Refilling:
@@ -136,6 +138,10 @@ class Aircraft : public cadmium::Atomic<AircraftState>
                 default:  // other phases end without sending anything
                     break;
             }
+        }
+
+        double dropVolume(const AircraftState& s) const{
+            return std::min(dropAmount, s.waterLeft);
         }
 
         [[nodiscard]] double timeAdvance(const AircraftState& s) const override
