@@ -107,12 +107,12 @@ public:
             surface.updateSurfaceInputsForTwoFuelModels(
                 neighborData.state->fuelModelNumber,
                 state.fuelModelNumber,
-                5.0, // moistureOneHour
-                6.0, // moistureTenHour
-                7.0, // moistureHundredHour
-                30.0, // moistureLiveHerbaceous
-                30.0, // moistureLiveWoody,
-                FractionUnits::Percent, // moistureUnits
+                state.moistureOneHour, 
+                state.moistureTenHour, 
+                state.moistureHundredHour, 
+                state.moistureLiveHerbaceous, 
+                state.moistureLiveWoody, 
+                FractionUnits::Percent, 
                 neighborData.state->windSpeed,
                 SpeedUnits::KilometersPerHour, // windSpeedUnits
                 WindHeightInputMode::DirectMidflame, // windHeightInputMode

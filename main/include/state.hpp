@@ -22,6 +22,11 @@ struct State
     double sigma;
     int spreadDir;
     double rateOfSpread;
+    double moistureOneHour;
+    double moistureTenHour;
+    double moistureHundredHour;
+    double moistureLiveHerbaceous;
+    double moistureLiveWoody;
 
     //set the initial conditions for state variables
     State()
@@ -36,8 +41,12 @@ struct State
         , ignited(false)            //whether the cell has ignited yet
         , sigma(0.0)                //time advance
         , spreadDir(0)              //direction that the fire is coming from
-        , rateOfSpread(0.0){}       //rate of spread of fire from that direction
-        
+        , rateOfSpread(0.0)       //rate of spread of fire from that direction
+        , moistureOneHour(5.0)          //dead fuel < 6 mm thick (twigs, litter), % moisture
+        , moistureTenHour(6.0)          //dead fuel 6-25 mm thick (small branches), % moisture
+        , moistureHundredHour(7.0)      //dead fuel 25-75 mm thick (larger branches), % moisture
+        , moistureLiveHerbaceous(30.0)  //living grasses and plants, % moisture
+        , moistureLiveWoody(30.0) {}      //living shrubs and leaves, % moisture
 };
 
 //Check whether the cell has changed
